@@ -875,35 +875,35 @@ require('lazy').setup({
 
   { -- File explorer for NeoVim
     'nvim-tree/nvim-tree.lua',
-    version = "*", -- Pin to a major version for stability
+    version = '*', -- Pin to a major version for stability
     dependencies = { 'nvim-tree/nvim-web-devicons' },
 
     -- Set keymaps
     keys = {
-      { "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "Toggle Explorer" },
+      { '<leader>e', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Explorer' },
 
       -- Window navigation
-      { "<leader>wh", "<cmd>wincmd h<CR>", desc = "Explorer: Go to left window" },
-      { "<leader>wl", "<cmd>wincmd l<CR>", desc = "Explorer: Go to right window" },
-      { "<leader>wk", "<cmd>wincmd k<CR>", desc = "Explorer: Go to upper window" },
-      { "<leader>wj", "<cmd>wincmd j<CR>", desc = "Explorer: Go to lower window" },
+      { '<leader>wh', '<cmd>wincmd h<CR>', desc = 'Explorer: Go to left window' },
+      { '<leader>wl', '<cmd>wincmd l<CR>', desc = 'Explorer: Go to right window' },
+      { '<leader>wk', '<cmd>wincmd k<CR>', desc = 'Explorer: Go to upper window' },
+      { '<leader>wj', '<cmd>wincmd j<CR>', desc = 'Explorer: Go to lower window' },
     },
-    
+
     config = function()
       -- This code runs AFTER the plugin has been loaded
       -- Setup nvim-tree with some basic options
-      require("nvim-tree").setup({
-        sort_by = "name",
+      require('nvim-tree').setup {
+        sort_by = 'name',
         view = {
           width = 35,
         },
         renderer = {
-          ground_empty = true, -- Show an icon for empty folders
+          group_empty = true, -- Show an icon for empty folders
         },
-        filterers = {
+        filters = {
           dotfiles = false, -- Hide dot files (like .git)
         },
-      })
+      }
     end,
   },
 
@@ -955,31 +955,25 @@ require('lazy').setup({
   },
 })
 
--- Automagically open the File Explorer when we run `nvim .`
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    local arg_count = #vim.fn.argv()
-    local is_dir = arg_count == 1 and vim.fn.isdirectory(vim.fn.argv()[1]) == 1
-    local no_args = arg_count == 0
+-- Automagically open the File Explorer when we start nvim with a directory
+local function open_nvim_tree(data)
+  -- Buffer is a real file on disk
+  local real_file = vim.fn.filereadable(data.file) == 1
 
-    -- Only run if we opened a directory OR opened nvim with no arguments
-    if is_dir or no_args then
-      -- Don't open if there's already a file-explorer open
-      if #vim.api.nvim_list_wins() > 1 then
-        return
-      end
+  -- Buffer is a directory
+  local directory = vim.fn.isdirectory(data.file) == 1
 
-      -- Open nvim-tree and focus it
-      vim.cmd.NvimTreeFocus()
+  if not directory then return end
 
-      -- Close the empty buffer that was opened by default
-      local bufnr = vim.api.nvim_get_current_buf()
-      if vim.api.nvim_buf_get_name(bufnr) == "" and vim.bo[bufnr].buftype == "" then
-        -- If the buffer is unnamed and not a special buffer, close it
-        vim.api.nvim_buf_delete(bufnr, { force = true })
-      end
-    end
-  end,
+  -- Change to a directory
+  vim.cmd.cd(data.file)
+
+  -- Open the tree
+  require('nvim-tree.api').tree.open()
+end
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = open_nvim_tree,
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
