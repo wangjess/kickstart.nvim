@@ -9,7 +9,7 @@ return {
   config = function()
     -- Import Catppuccin module and setup with custom options
     require('catppuccin').setup {
-      flavour = 'latte', -- Choose your preferred flavor: latte, frappe, macchiato, mocha
+      flavour = 'mocha', -- Choose your preferred flavor: latte, frappe, macchiato, mocha
       transparent_background = false, -- Disable transparent background
       term_colors = true, -- Enable terminal colors
       integrations = {
