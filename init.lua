@@ -107,6 +107,11 @@ vim.g.have_nerd_font = true
 -- Enable line wrap
 vim.opt.wrap = true
 
+-- Set tab to be 4 spaces
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+
 -- Make line numbers default
 vim.o.number = true
 
